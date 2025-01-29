@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Calculator</h1>
+        <div class="form">
+            <label for="expenseCost"> Enter Expence Cost :</label>
+            <input type="number" id="expenseCost" placeholder="Enter amount">
+            
+            <label for="expenseType">Type:</label>
+            <select id="expenseType">
+                <option value="Accommodation">Accommodation</option>
+                <option value="Travel">Travel</option>
+                <option value="Food">Food</option>
+                <option value="Activities">Activities</option>
+                <option value="Car Expenses">Car Expenses</option>
+            </select>
+
+            <button id="addExpense">Enter</button>
+            
+            <div class="chart-section">
+                <h2>Break Down</h2>
+                <center>
+                    <canvas id="expenseChart"></canvas>
+                </center>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
 
