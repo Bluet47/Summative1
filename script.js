@@ -6,27 +6,36 @@ const expenses = {
     "Car Expenses": 0,
 };
 
-const ctx = document.getElementById('expenseChart').getContext('2d');
-const expenseChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: Object.keys(expenses),
-        datasets: [{
-            data: Object.values(expenses),
-            backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#ff5722', '#9c27b0'],
-            borderColor: '#fff',
-            borderWidth: 2,
-        }],
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom',
+let expenseChart = null;
+
+function createChart() {
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    
+    if (expenseChart) {
+        expenseChart.destroy(); // Ensure old chart is removed
+    }
+
+    expenseChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(expenses),
+            datasets: [{
+                data: Object.values(expenses),
+                backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#ff5722', '#9c27b0'],
+                borderColor: '#fff',
+                borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive: false, // Disable responsiveness to avoid ResizeObserver
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
             },
         },
-    },
-});
+    });
+}
 
 document.getElementById('addExpense').addEventListener('click', () => {
     const cost = parseFloat(document.getElementById('expenseCost').value);
@@ -34,8 +43,7 @@ document.getElementById('addExpense').addEventListener('click', () => {
 
     if (!isNaN(cost) && cost > 0) {
         expenses[type] += cost;
-        expenseChart.data.datasets[0].data = Object.values(expenses);
-        expenseChart.update();
+        createChart(); // Recreate the chart with updated data
     } else {
         alert('Please enter a valid amount.');
     }
@@ -43,3 +51,4 @@ document.getElementById('addExpense').addEventListener('click', () => {
     document.getElementById('expenseCost').value = '';
 });
 
+createChart(); // Initialize chart on page load
