@@ -34,6 +34,9 @@ jobs:
     - name: Install jsdom
       run: npm install --save-dev jsdom
 
+    - name: Install chart.js
+      run: npm install --save-dev chart.js
+
     - name: Build project
       run: npm run build --if-present
 
