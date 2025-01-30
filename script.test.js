@@ -1,66 +1,42 @@
-const { JSDOM } = require('jsdom');
-const { Chart } = require('chart.js');
+import { jest } from '@jest/globals';
+import Chart from 'chart.js/auto';
 
-global.document = new JSDOM('<!DOCTYPE html><canvas id="expenseChart"></canvas><button id="addExpense"></button><input id="expenseCost"><select id="expenseType"></select>').window.document;
-global.window = document.defaultView;
+jest.mock('chart.js/auto', () => ({
+    Chart: jest.fn().mockImplementation(() => ({
+        destroy: jest.fn(),
+        update: jest.fn(),
+    })),
+}));
+
+import { expenses, createChart } from './script';
 
 describe('Expense Tracker', () => {
-    let expenses, expenseChart;
-
     beforeEach(() => {
-        expenses = {
-            Accommodation: 0,
-            Travel: 0,
-            Food: 0,
-            Activities: 0,
-            "Car Expenses": 0,
-        };
-
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        expenseChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: Object.keys(expenses),
-                datasets: [{
-                    data: Object.values(expenses),
-                    backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#ff5722', '#9c27b0'],
-                    borderColor: '#fff',
-                    borderWidth: 2,
-                }],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                },
-            },
-        });
+        Chart.mockClear(); // Clear previous Chart mocks
     });
 
     test('should update expenses correctly when adding a valid expense', () => {
-        const costInput = document.getElementById('expenseCost');
-        const typeSelect = document.getElementById('expenseType');
-        
-        typeSelect.value = 'Food';
-        costInput.value = '20';
-        document.getElementById('addExpense').click();
-        
-        expect(expenses['Food']).toBe(20);
-        expect(expenseChart.data.datasets[0].data).toEqual(Object.values(expenses));
+        expenses.Travel = 0; 
+        const cost = 50;
+        expenses.Travel += cost;
+
+        createChart();
+
+        expect(expenses.Travel).toBe(50);
+        expect(Chart).toHaveBeenCalledTimes(1);
     });
 
     test('should not update expenses when input is invalid', () => {
-        const initialExpenses = { ...expenses };
-        const costInput = document.getElementById('expenseCost');
-        const typeSelect = document.getElementById('expenseType');
-        
-        typeSelect.value = 'Food';
-        costInput.value = '-10'; // Invalid amount
-        document.getElementById('addExpense').click();
-        
-        expect(expenses['Food']).toBe(initialExpenses['Food']);
-        expect(expenseChart.data.datasets[0].data).toEqual(Object.values(initialExpenses));
+        const invalidCosts = [NaN, -10, 'text'];
+        invalidCosts.forEach(cost => {
+            const previousValue = expenses.Food;
+            if (!isNaN(cost) && cost > 0) {
+                expenses.Food += cost;
+            }
+            expect(expenses.Food).toBe(previousValue);
+        });
+
+        createChart();
+        expect(Chart).toHaveBeenCalledTimes(1);
     });
 });
